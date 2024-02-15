@@ -1,6 +1,6 @@
 generator custom_generator {
   provider = "node ../../node_modules/prisma-generator-openapi-docs"
-  output   = "../types"
+  output   = "../typespec"
 }
 
 datasource db {
@@ -8,27 +8,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+enum AnimalType {
+  Mammal
+  Reptile
+  Bird
+  Amphibian
+  Fish
 }
 
-enum NotificationType {
-  newPosts
-  newComments
-  newFollowers
-  reply
-  heartOnPost
-  heartOnComment
-  heartOnReply
+enum Diet {
+  Carnivore
+  Herbivore
+  Omnivore
 }
 
-enum Language {
-  Typescript
-  Javascript
-  Rust
-  Go
-  Python
-  Cpp
+model Animal {
+  id      Int        @id @default(autoincrement())
+  name    String
+  species String
+  age     Int
+  type    AnimalType
+  diet    Diet
+
+  zooId Int
+  zoo   Zoo @relation(fields: [zooId], references: [id])
+}
+
+model Habitat {
+  id      Int    @id @default(autoincrement())
+  name    String
+  climate String
+
+  zoos Zoo[]
+}
+
+model Zoo {
+  id         Int    @id @default(autoincrement())
+  name       String
+  locationId Int
+
+  location Habitat  @relation(fields: [locationId], references: [id])
+  animals  Animal[]
 }

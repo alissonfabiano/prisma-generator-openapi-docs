@@ -1,6 +1,13 @@
 import prettier from 'prettier'
 
-export const formatFile = (content: string): Promise<string> => {
+export type BuiltInParserName =
+  | prettier.BuiltInParserName
+  | 'typespec';
+
+export const formatFile = (
+  content: string,
+  parser: prettier.LiteralUnion<BuiltInParserName, string>,
+): Promise<string> => {
   return new Promise((res, rej) =>
     prettier.resolveConfig(process.cwd()).then((options) => {
       if (!options) {
@@ -10,13 +17,13 @@ export const formatFile = (content: string): Promise<string> => {
       try {
         const formatted = prettier.format(content, {
           ...options,
-          parser: 'typescript',
+          parser,
         })
 
         res(formatted)
       } catch (error) {
         rej(error)
       }
-    })
+    }),
   )
 }
